@@ -1,0 +1,26 @@
+{
+  "name": "gk/phpstorm-configurator",
+  "type": "application",
+  "keywords": [
+    "PHPStorm",
+    "Configurator",
+    "Symfony2"
+  ],
+  "description": "Configure PHPStorm project (including Symfony2 plugin)",
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/console": "~2.6",
+    "symfony/finder": "~2.6"
+  },
+  "autoload": {
+    "psr-0": {"Gk\\PHPStormConfigurator\\": "src"}
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Gunther Konig",
+      "email": "gunther_konig@yahoo.com"
+    }
+  ],
+  "bin": ["bin/phpstorm-configurator"]
+}
