@@ -44,3 +44,32 @@ phpstorm-configurator configure -p symfony2
 
 This marks ``app/cache`` and ``app/logs`` as excluded and enables the [Symfony2 plugin](http://symfony2-plugin.espend.de/)
 
+## Code usage
+
+If you want to finetune the configuration of the project:
+
+```php
+#!/usr/bin/env php
+<?php
+
+require_once $_SERVER['HOME'] . "/.composer/vendor/autoload.php";
+
+$projectDir = getcwd();
+$configurator = new \Gk\PHPStormConfigurator\ProjectConfigurator($projectDir);
+
+$imlPlugin = $configurator->getPlugin('iml');
+$imlPlugin
+    ->addExcludeFolder('app/cache')
+    ->addExcludeFolder('app/logs')
+;
+
+$symfony2Plugin = $configurator->getPlugin('symfony2');
+$symfony2Plugin
+    ->addOption("directoryToApp", "app")
+    ->addOption("pathToUrlGenerator", "app/cache/dev/adminDevUrlGenerator.php")
+    ->addOption("pathToTranslation", "app/cache/dev/translations")
+    ->addContainerFile("app/cache/dev/adminDevDebugProjectContainer.xml")
+;
+
+$configurator->writeConfig();
+```
