@@ -78,5 +78,16 @@ $symfony2Plugin
     ->addContainerFile("app/cache/dev/adminDevDebugProjectContainer.xml")
 ;
 
+/**
+ * Add some files/directories to the default favorite list.
+ * The directories must be traversed recursively, for each child PHPStorm requires an entry in workspace.xml
+ * Adding directories with a large number of children can slow down your script.
+ */
+$workspacePlugin = $configurator->getPlugin('workspace');
+$workspacePlugin
+    ->addToFavorites($projectDir . '/dir1')
+    ->addToFavorites($projectDir . '/file2')
+    ;
+
 $configurator->writeConfig();
 ```
