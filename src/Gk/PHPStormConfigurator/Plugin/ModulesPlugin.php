@@ -30,7 +30,8 @@ XML;
 
     public function buildConfig()
     {
-        $url = $path = sprintf('file://$PROJECT_DIR$/.idea/%s', $this->configurator->getPlugin('iml')->getConfigFileName());
+        $path = sprintf('$PROJECT_DIR$/.idea/%s', $this->configurator->getPlugin('iml')->getConfigFileName());
+        $url = sprintf('file://%s', $path);
 
         $this->ensureChild($this->getModulesNode(), 'module', array(
             'fileurl' => $url,
