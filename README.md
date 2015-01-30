@@ -57,12 +57,19 @@ require_once $_SERVER['HOME'] . "/.composer/vendor/autoload.php";
 $projectDir = getcwd();
 $configurator = new \Gk\PHPStormConfigurator\ProjectConfigurator($projectDir);
 
+/**
+ * Exclude some folders
+ */
 $imlPlugin = $configurator->getPlugin('iml');
 $imlPlugin
     ->addExcludeFolder('app/cache')
     ->addExcludeFolder('app/logs')
 ;
 
+/**
+ * Configure the Symfony2 plugin (http://symfony2-plugin.espend.de/).
+ * This also excludes the app/cache and app/logs directories
+ */
 $symfony2Plugin = $configurator->getPlugin('symfony2');
 $symfony2Plugin
     ->addOption("directoryToApp", "app")
