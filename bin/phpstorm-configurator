@@ -10,6 +10,6 @@ if ($uri = \Phar::running()) {
   throw new \Exception('Could not find any autoloader');
 }
 
-$application = new \Symfony\Component\Console\Application('phpstorm-downloader', '1.0.7');
+$application = new \Symfony\Component\Console\Application('phpstorm-configurator', '0.1');
 $application->add(new \Gk\PHPStormConfigurator\Command\ConfigureCommand());
 $application->run();
