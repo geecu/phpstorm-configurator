@@ -28,10 +28,24 @@ class ProjectConfigurator
      */
     private $availablePlugins = [];
 
-    public function __construct($path, $projectName = '')
+    public function __construct($path = null, $projectName = '')
+    {
+        if($path) {
+            $this->setPath($path);
+        }
+
+        $this->projectName = $projectName;
+
+        $this->registerBuiltinPlugins();
+
+        $this->enablePlugin('iml');
+        $this->enablePlugin('modules');
+    }
+
+    public function setPath($path)
     {
         $this->path = $path;
-        $this->ideaPath = $this->path.DIRECTORY_SEPARATOR.'.idea';
+        $this->ideaPath = $this->path . DIRECTORY_SEPARATOR . '.idea';
 
         if (!file_exists($this->ideaPath)) {
             mkdir($this->ideaPath);
@@ -41,16 +55,14 @@ class ProjectConfigurator
             throw new \RuntimeException(sprintf('Path to project (%s) is not a directory', $this->ideaPath));
         }
 
-        if (empty($projectName)) {
-            $projectName = basename($this->path);
+        if (empty($this->projectName)) {
+            $this->projectName = basename($this->getPath());
         }
+    }
 
+    public function setProjectName($projectName)
+    {
         $this->projectName = $projectName;
-
-        $this->registerBuiltinPlugins();
-
-        $this->enablePlugin('iml');
-        $this->enablePlugin('modules');
     }
 
     /**
@@ -116,26 +128,45 @@ class ProjectConfigurator
 
     protected function registerBuiltinPlugins()
     {
-        $dir = __DIR__.DIRECTORY_SEPARATOR.'Plugin';
+        $dir = __DIR__ . DIRECTORY_SEPARATOR . 'Plugin';
         $finder = new Finder();
         $finder->files()->name('*Plugin.php')->in($dir);
 
-        $prefix = __NAMESPACE__.'\\Plugin';
+        $prefix = __NAMESPACE__ . '\\Plugin';
         foreach ($finder as $pluginFile) {
             $ns = $prefix;
             if ($relativePath = $pluginFile->getRelativePath()) {
-                $ns .= '\\'.strtr($relativePath, '/', '\\');
+                $ns .= '\\' . strtr($relativePath, '/', '\\');
             }
-            $class = $ns.'\\'.$pluginFile->getBasename('.php');
+            $class = $ns . '\\' . $pluginFile->getBasename('.php');
 
             $r = new \ReflectionClass($class);
-            if ($r->isSubclassOf($prefix.'\\PluginInterface')
+            if ($r->isSubclassOf($prefix . '\\PluginInterface')
                 && !$r->isAbstract()
-                && $r->getConstructor()->getNumberOfRequiredParameters() == 1) {
+                && $r->getConstructor()->getNumberOfRequiredParameters() == 1
+            ) {
                 /** @var PluginInterface $plugin */
                 $plugin = $r->newInstance($this);
                 $this->registerPlugin($plugin->getName(), $plugin);
             }
         }
     }
+
+    /**
+     * @return Plugin\PluginInterface[]
+     */
+    public function getPlugins()
+    {
+        return $this->plugins;
+    }
+
+    /**
+     * @return Plugin\PluginInterface[]
+     */
+    public function getAvailablePlugins()
+    {
+        return $this->availablePlugins;
+    }
+
+
 }

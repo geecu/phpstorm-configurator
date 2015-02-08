@@ -2,6 +2,8 @@
 
 namespace Gk\PHPStormConfigurator\Command;
 
+use Gk\PHPStormConfigurator\Plugin\CommandConfiguratorInterface;
+use Gk\PHPStormConfigurator\Plugin\ExecutableInterface;
 use Gk\PHPStormConfigurator\ProjectConfigurator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,6 +14,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConfigureCommand extends Command
 {
+    protected $configurator;
+
+    /**
+     * @return mixed
+     */
+    protected function getConfigurator()
+    {
+        if (!$this->configurator) {
+            $this->configurator = new ProjectConfigurator();
+        }
+        return $this->configurator;
+    }
+
+
     protected function configure()
     {
         $this->setName('configure')
@@ -23,28 +39,30 @@ class ConfigureCommand extends Command
                 'Enable plugin',
                 null
             )
-            ->addOption(
-                'exclude',
-                'x',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Exclude folder',
-                null
-            )
             ->addArgument('path',
                 InputArgument::OPTIONAL,
                 'The path to the project (defaults to current working directory)',
                 getcwd()
             )
         ;
+        $plugins = $this->getConfigurator()->getPlugins();
+        foreach ($plugins as $plugin) {
+            if ($plugin instanceof CommandConfiguratorInterface) {
+                $plugin->configureCommand($this);
+            }
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configurator = new ProjectConfigurator($input->getArgument('path'));
+        $configurator = $this->getConfigurator();
+        $configurator->setPath($input->getArgument('path'));
 
-        foreach ($input->getOption('exclude') as $excludedFolder) {
-            $configurator->getPlugin('iml')
-                ->addExcludeFolder($excludedFolder);
+        $plugins = $this->getConfigurator()->getPlugins();
+        foreach ($plugins as $plugin) {
+            if ($plugin instanceof ExecutableInterface) {
+                $plugin->execute($input);
+            }
         }
 
         foreach ($input->getOption('plugin') as $pluginName) {
