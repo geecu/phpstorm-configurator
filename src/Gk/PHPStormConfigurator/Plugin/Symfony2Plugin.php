@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
-class Symfony2Plugin extends AbstractXMLPlugin implements ExecutableInterface, CommandConfiguratorInterface
+class Symfony2Plugin extends AbstractExecutableXMLPlugin implements CommandConfiguratorInterface
 {
 
     protected function getXMLTemplate()
@@ -65,8 +65,7 @@ XML;
 
     public function execute(InputInterface $input)
     {
-        $this->buildConfig();
-        $this->writeConfig();
+        parent::execute($input);
 
         $iml = $this->configurator->getPlugin('iml');
         $iml->writeConfig();
