@@ -3,7 +3,11 @@
 namespace Gk\PHPStormConfigurator\Plugin;
 
 
-class ModulesPlugin extends AbstractXMLPlugin
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+
+class ModulesPlugin extends AbstractXMLPlugin implements ExecutableInterface, CommandConfiguratorInterface
 {
 
     protected function getXMLTemplate()
@@ -48,5 +52,22 @@ XML;
             ->childNodes->item(0)//component
             ->childNodes->item(0)//modules
             ;
+    }
+
+    public function execute(InputInterface $input)
+    {
+        $this->buildConfig();
+        $this->writeConfig();
+    }
+
+    public function configureCommand(Command $command)
+    {
+        $command->addOption(
+            'plugin-modules',
+            'm',
+            InputOption::VALUE_NONE,
+            'Enable modules plugin',
+            null
+        );
     }
 }
