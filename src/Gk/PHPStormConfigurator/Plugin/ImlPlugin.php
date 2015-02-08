@@ -76,6 +76,6 @@ XML;
         foreach ($input->getOption('exclude') as $excludedFolder) {
             $this->addExcludeFolder($excludedFolder);
         }
-
+        $this->writeConfig();
     }
 }
