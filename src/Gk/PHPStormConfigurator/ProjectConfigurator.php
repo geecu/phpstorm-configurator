@@ -23,10 +23,6 @@ class ProjectConfigurator
      * @var PluginInterface[]
      */
     private $plugins = [];
-    /**
-     * @var PluginInterface[]
-     */
-    private $availablePlugins = [];
 
     public function __construct($path = null, $projectName = '')
     {
@@ -37,9 +33,6 @@ class ProjectConfigurator
         $this->projectName = $projectName;
 
         $this->registerBuiltinPlugins();
-
-        $this->enablePlugin('iml');
-        $this->enablePlugin('modules');
     }
 
     public function setPath($path)
@@ -89,41 +82,21 @@ class ProjectConfigurator
         return $this->projectName;
     }
 
-    public function writeConfig()
-    {
-        foreach ($this->plugins as $plugin) {
-            $plugin->buildConfig();
-        }
-
-        foreach ($this->plugins as $plugin) {
-            $plugin->writeConfig();
-        }
-    }
-
     public function getPlugin($name)
     {
         if (isset($this->plugins[$name])) {
             return $this->plugins[$name];
         }
 
-        return $this->enablePlugin($name);
-    }
-
-    public function enablePlugin($name)
-    {
-        if (isset($this->availablePlugins[$name])) {
-            return $this->plugins[$name] = $this->availablePlugins[$name];
-        }
-
         throw new \RuntimeException(sprintf('Plugin %s is not registered. Available plugins are: %s',
             $name,
-            implode(', ', array_keys($this->availablePlugins)
+            implode(', ', array_keys($this->plugins)
             )));
     }
 
     public function registerPlugin($name, $plugin)
     {
-        $this->availablePlugins[$name] = $plugin;
+        $this->plugins[$name] = $plugin;
     }
 
     protected function registerBuiltinPlugins()
@@ -159,14 +132,4 @@ class ProjectConfigurator
     {
         return $this->plugins;
     }
-
-    /**
-     * @return Plugin\PluginInterface[]
-     */
-    public function getAvailablePlugins()
-    {
-        return $this->availablePlugins;
-    }
-
-
 }
