@@ -17,7 +17,7 @@ class ConfigureCommand extends Command
     protected $configurator;
 
     /**
-     * @return mixed
+     * @return ProjectConfigurator
      */
     protected function getConfigurator()
     {
@@ -32,13 +32,6 @@ class ConfigureCommand extends Command
     {
         $this->setName('configure')
             ->setDescription('Initializes a PHPStorm project, optionally allowing to add some extra configurations (excluded/favorite folders/enable symfony2 plugin, etc.)')
-            ->addOption(
-                'plugin',
-                'p',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Enable plugin',
-                null
-            )
             ->addArgument('path',
                 InputArgument::OPTIONAL,
                 'The path to the project (defaults to current working directory)',
@@ -64,11 +57,5 @@ class ConfigureCommand extends Command
                 $plugin->execute($input);
             }
         }
-
-        foreach ($input->getOption('plugin') as $pluginName) {
-            $configurator->enablePlugin($pluginName);
-        }
-
-        $configurator->writeConfig();
     }
 }
