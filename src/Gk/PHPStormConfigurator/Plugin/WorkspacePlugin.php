@@ -26,7 +26,7 @@ XML;
         return 'workspace';
     }
 
-    public function addToFavorites($path)
+    public function addToFavorites($path, $recursive = true)
     {
         if (!file_exists($path)) {
             throw new \RuntimeException(sprintf("Cannot add path '%s' to favorites because it doesn't exit", $path));
@@ -42,23 +42,25 @@ XML;
             return;
         }
 
-        $finder = new Finder();
-        $finder->in($path);
+        if ($recursive) {
+            $finder = new Finder();
+            $finder->in($path);
 
-        $directoryNodes = [];
-        foreach ($finder as $favorite) {
-            /** * @var SplFileInfo $favorite */
-            $favoritePath = $favorite->getPath();
-            if (isset($directoryNodes[$favoritePath])) {
-                $parentNode = $directoryNodes[$favoritePath];
-            } else {
-                $parentNode = $rootNode;
-            }
+            $directoryNodes = [];
+            foreach ($finder as $favorite) {
+                /** * @var SplFileInfo $favorite */
+                $favoritePath = $favorite->getPath();
+                if (isset($directoryNodes[$favoritePath])) {
+                    $parentNode = $directoryNodes[$favoritePath];
+                } else {
+                    $parentNode = $rootNode;
+                }
 
-            $favoriteNode = $this->ensureChild($parentNode, 'favorite_root', $this->getFavoriteAttributes($favorite));
+                $favoriteNode = $this->ensureChild($parentNode, 'favorite_root', $this->getFavoriteAttributes($favorite));
 
-            if ($favorite->isDir()) {
-                $directoryNodes[$favorite->getPathname()] = $favoriteNode;
+                if ($favorite->isDir()) {
+                    $directoryNodes[$favorite->getPathname()] = $favoriteNode;
+                }
             }
         }
 
