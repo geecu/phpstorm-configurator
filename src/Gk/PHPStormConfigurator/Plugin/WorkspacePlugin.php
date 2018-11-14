@@ -67,6 +67,14 @@ XML;
         return $this;
     }
 
+    public function addWindowInfo($attributes)
+    {
+        $componentNode = $this->ensureChild($this->getProjectNode(), 'component', ['name' => 'ToolWindowManager']);
+        $layoutNode = $this->ensureChild($componentNode, 'layout');
+
+        $this->ensureChild($layoutNode, 'window_info', $attributes);
+    }
+
     protected function getFavoriteAttributes(\SplFileInfo $favorite)
     {
         $url = preg_replace(sprintf('@^%s@', $this->configurator->getPath()), 'file://$PROJECT_DIR$', $favorite->getPathname());
