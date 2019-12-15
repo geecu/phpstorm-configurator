@@ -2,7 +2,11 @@
 
 namespace Gk\PHPStormConfigurator\Plugin;
 
-class Symfony2Plugin extends AbstractXMLPlugin
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+
+class Symfony2Plugin extends AbstractExecutableXMLPlugin implements CommandConfiguratorInterface
 {
 
     protected function getXMLTemplate()
@@ -57,5 +61,24 @@ XML;
             ->childNodes->item(0)//project
             ->childNodes->item(0)//component
             ;
+    }
+
+    public function execute(InputInterface $input)
+    {
+        parent::execute($input);
+
+        $iml = $this->configurator->getPlugin('iml');
+        $iml->writeConfig();
+    }
+
+    public function configureCommand(Command $command)
+    {
+        $command->addOption(
+            'plugin-symfony2',
+            's',
+            InputOption::VALUE_NONE,
+            'Enable symfony2 plugin',
+            null
+        );
     }
 }

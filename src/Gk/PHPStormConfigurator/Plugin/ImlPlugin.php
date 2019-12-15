@@ -3,7 +3,11 @@
 namespace Gk\PHPStormConfigurator\Plugin;
 
 
-class ImlPlugin extends AbstractXMLPlugin
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+
+class ImlPlugin extends AbstractXMLPlugin implements CommandConfiguratorInterface, ExecutableInterface
 {
 
     protected function getXMLTemplate()
@@ -50,9 +54,28 @@ XML;
 
     private function pathToURL($path)
     {
-        $relativePath = preg_replace('@^'.$this->configurator->getPath().'@i', '', $path);
+        $relativePath = preg_replace('@^' . $this->configurator->getPath() . '@i', '', $path);
         $relativePath = ltrim($relativePath, '/');
 
         return sprintf('file://$MODULE_DIR$/%s', $relativePath);
+    }
+
+    public function configureCommand(Command $command)
+    {
+        $command->addOption(
+            'exclude',
+            'x',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Exclude folder',
+            null
+        );
+    }
+
+    public function execute(InputInterface $input)
+    {
+        foreach ($input->getOption('exclude') as $excludedFolder) {
+            $this->addExcludeFolder($excludedFolder);
+        }
+        $this->writeConfig();
     }
 }
